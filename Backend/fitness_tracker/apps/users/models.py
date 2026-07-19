@@ -20,3 +20,17 @@ class Profile(models.Model):
     onboarding_completed = models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateTimeField(auto_now=True)
+
+
+class WeightLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="weight_logs")
+    weight_kg = models.FloatField()
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "date")
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.weight_kg}kg on {self.date}"

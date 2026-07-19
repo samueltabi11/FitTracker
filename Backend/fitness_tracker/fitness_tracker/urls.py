@@ -19,17 +19,16 @@ from django.http import HttpResponse
 from django.urls import include, path
 
 
-
 def handshake(request):
     return HttpResponse("Welcome to the Fitness Tracker API!")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', handshake),                     # no parentheses
-    path('users/', include('apps.users.urls')),
-    path('workouts/', include('apps.workouts.urls')),
-    path('progress/', include('apps.progress.urls')),
-    path('goals/', include('apps.goals.urls')),       # missing
-    path('activity/', include('apps.activity.urls')), # missing
+    path('', handshake),
+    path('api/', include('apps.users.urls')),
+    path('api/', include('apps.workouts.urls')),
+    path('api/', include('apps.progress.urls')),
+    path('api/', include('apps.goals.urls')),
+    path('api/', include('apps.activity.urls')),
 ]
 
