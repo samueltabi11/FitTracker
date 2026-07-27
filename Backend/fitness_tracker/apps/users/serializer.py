@@ -38,8 +38,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
+        # Profile is created by the post_save signal in signals.py once the User row exists
         user = User.objects.create_user(**validated_data)
-        Profile.objects.create(user=user)
         return user
 
 
