@@ -1,12 +1,12 @@
 import { NavLink, useNavigate, useLocation } from 'react-router-dom'
-import { isAuthenticated, logout } from '../auth'
+import { hasAccess, logout } from '../auth'
 
 function Nav() {
   const navigate = useNavigate()
   // subscribes Nav to route changes so it re-checks the token right after login/logout redirects
   useLocation()
 
-  const loggedIn = isAuthenticated()
+  const loggedIn = hasAccess()
 
   const handleLogout = () => {
     logout()

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TOKEN_KEY } from '../auth'
+import { TOKEN_KEY, continueAsGuest } from '../auth'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -8,6 +8,11 @@ function LoginForm() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+
+  const handleGuest = () => {
+    continueAsGuest()
+    navigate('/')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -61,6 +66,9 @@ function LoginForm() {
       </div>
 
       <button type="submit">Log In</button>
+      <button type="button" onClick={handleGuest}>
+        Continue as Guest
+      </button>
     </form>
   )
 }
