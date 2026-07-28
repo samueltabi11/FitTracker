@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 #dont forget to set DEBUG=False in production and add your domain to ALLOWED_HOSTS
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fittracker-4cqg.onrender.com']
 
 
 # Application definition
