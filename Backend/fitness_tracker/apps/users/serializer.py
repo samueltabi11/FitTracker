@@ -39,7 +39,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('password_confirm')
         user = User.objects.create_user(**validated_data)
-        Profile.objects.create(user=user)
+        #Profile.objects.create(user=user) ---------------------> creating bug yo
         return user
 
 
