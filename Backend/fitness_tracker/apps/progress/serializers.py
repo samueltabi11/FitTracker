@@ -16,6 +16,9 @@ class PRSerializer(serializers.Serializer):
     max_weight = serializers.FloatField()
     date = serializers.DateField()
 
+class WeightProgressionSerializer(serializers.Serializer):
+    date = serializers.DateField()
+    weight_kg = serializers.FloatField()
 
 class ComparisonSerializer(serializers.Serializer):
     period = serializers.CharField()
