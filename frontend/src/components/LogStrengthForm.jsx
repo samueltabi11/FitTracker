@@ -1,5 +1,18 @@
 import { useState } from 'react'
 
+const STRENGTH_EXERCISES = [
+  'Bench Press',
+  'Squat',
+  'Deadlift',
+  'Overhead Press',
+  'Dumbbell Shoulder Press',
+  'Bicep Curl',
+  'Lat Pulldown',
+  'Leg Press'
+]
+
+const OTHER_EXERCISE = 'other'
+
 // strength's own form since it's a separate table on the backend (sets/reps/weight live here, cardio doesn't have these)
 function LogStrengthForm() {
   const [workoutName, setWorkoutName] = useState('')
@@ -7,7 +20,11 @@ function LogStrengthForm() {
   const [duration, setDuration] = useState('')
   const [notes, setNotes] = useState('')
 
-  const [exerciseName, setExerciseName] = useState('')
+  const [exerciseSelection, setExerciseSelection] = useState(STRENGTH_EXERCISES[0])
+  const [customExerciseName, setCustomExerciseName] = useState('')
+  const exerciseName =
+    exerciseSelection === OTHER_EXERCISE ? customExerciseName : exerciseSelection
+
   const [sets, setSets] = useState([
     { set_number: 1, reps: '', weight_kg: '', is_completed: false }
   ])
@@ -23,6 +40,14 @@ function LogStrengthForm() {
   const updateSet = (index, field, value) => {
     const updatedSets = [...sets]
     updatedSets[index][field] = value
+    setSets(updatedSets)
+  }
+
+  // drops the set and renumbers the rest so set_number stays sequential
+  const removeSet = (index) => {
+    const updatedSets = sets
+      .filter((_, i) => i !== index)
+      .map((set, i) => ({ ...set, set_number: i + 1 }))
     setSets(updatedSets)
   }
 
@@ -89,12 +114,27 @@ function LogStrengthForm() {
 
       <div>
         <label>Exercise Name</label>
-        <input
-          type="text"
-          value={exerciseName}
-          onChange={(e) => setExerciseName(e.target.value)}
+        <select
+          value={exerciseSelection}
+          onChange={(e) => setExerciseSelection(e.target.value)}
           required
-        />
+        >
+          {STRENGTH_EXERCISES.map((exercise) => (
+            <option key={exercise} value={exercise}>
+              {exercise}
+            </option>
+          ))}
+          <option value={OTHER_EXERCISE}>Other (type your own)</option>
+        </select>
+        {exerciseSelection === OTHER_EXERCISE && (
+          <input
+            type="text"
+            placeholder="Enter exercise name"
+            value={customExerciseName}
+            onChange={(e) => setCustomExerciseName(e.target.value)}
+            required
+          />
+        )}
       </div>
 
       <h3>Sets</h3>
@@ -115,6 +155,11 @@ function LogStrengthForm() {
             onChange={(e) => updateSet(index, 'weight_kg', e.target.value)}
             required
           />
+          {sets.length > 1 && (
+            <button type="button" onClick={() => removeSet(index)}>
+              Remove
+            </button>
+          )}
         </div>
       ))}
       <button type="button" onClick={addSet}>

@@ -131,6 +131,11 @@ form > div:has(span) input {
   min-width: 100px;
 }
 
+form > div:has(span) button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
 form label {
   font-size: 14px;
   font-weight: 500;
@@ -340,4 +345,87 @@ form .form-success {
 
 .progress-extra .progress-section {
   max-width: none;
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.history-search {
+  width: 100%;
+  max-width: 480px;
+}
+
+.history-search input {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.history-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+}
+
+.workout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+}
+
+.workout-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workout-name {
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.workout-card-header button {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+}
+
+.workout-meta {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.history-empty {
+  color: var(--text);
+  font-size: 15px;
 }

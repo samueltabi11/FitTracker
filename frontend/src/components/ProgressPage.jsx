@@ -125,7 +125,7 @@ function ProgressPage() {
         </table>
       </div>
 
-      {/* not part of Requirements Doc 2.6, kept separate below the required charts/table */}
+      {/* Weekly comparison summary */}
       <div className="progress-extra">
         <div className="progress-section">
           <h2>This Week vs Last Week</h2>

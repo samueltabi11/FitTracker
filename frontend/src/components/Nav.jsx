@@ -22,6 +22,7 @@ function Nav() {
           <NavLink to="/log-cardio">Log Cardio</NavLink>
           <NavLink to="/goals">Goals</NavLink>
           <NavLink to="/progress">Progress</NavLink>
+          <NavLink to="/history">History</NavLink>
           <button type="button" onClick={handleLogout}>
             Logout
           </button>

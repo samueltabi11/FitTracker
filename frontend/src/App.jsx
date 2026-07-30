@@ -6,6 +6,7 @@ import LogStrengthForm from './components/LogStrengthForm'
 import LogCardioForm from './components/LogCardioForm'
 import GoalsPage from './components/GoalsPage'
 import ProgressPage from './components/ProgressPage'
+import HistoryPage from './components/HistoryPage'
 import LoginForm from './components/LoginForm'
 import RegisterForm from './components/RegisterForm'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -53,6 +54,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ProgressPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <HistoryPage />
             </ProtectedRoute>
           }
         />

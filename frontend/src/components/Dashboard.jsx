@@ -17,6 +17,9 @@ function Dashboard() {
       <Link to="/progress">
         <button type="button">Progress</button>
       </Link>
+      <Link to="/history">
+        <button type="button">History</button>
+      </Link>
     </div>
   )
 }
