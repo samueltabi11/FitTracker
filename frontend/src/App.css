@@ -299,6 +299,21 @@ form .form-success {
   margin: 0;
 }
 
+.progress-section select {
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.progress-section select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
 .progress-section table {
   width: 100%;
   border-collapse: collapse;
@@ -353,6 +368,19 @@ form .form-success {
   align-items: center;
   gap: 24px;
   width: 100%;
+}
+
+.history .form-error {
+  width: 100%;
+  max-width: 480px;
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.4);
 }
 
 .history-search {
