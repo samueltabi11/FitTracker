@@ -1,11 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { isAuthenticated, authFetch } from '../auth'
 
-// TODO: replace with useState + useEffect/fetch() to GET /api/workouts/ once auth is wired up
-const mockWorkouts = [
-  { id: 1, name: 'Upper Body Day', date: '2026-07-22', duration_minutes: 60, exercise_count: 3 },
-  { id: 2, name: 'Leg Day', date: '2026-07-20', duration_minutes: 45, exercise_count: 4 },
-  { id: 3, name: 'Morning Run', date: '2026-07-19', duration_minutes: 30, exercise_count: 1 }
-]
+const WORKOUTS_URL = 'http://localhost:8000/api/workouts/'
 
 function formatDate(isoDate) {
   return new Date(isoDate).toLocaleDateString('en-US', {
@@ -17,20 +13,65 @@ function formatDate(isoDate) {
 }
 
 function HistoryPage() {
-  const [workouts] = useState(mockWorkouts)
+  const [workouts, setWorkouts] = useState([])
   const [search, setSearch] = useState('')
+  const [error, setError] = useState('')
+
+  const fetchWorkouts = async () => {
+    try {
+      const response = await authFetch(WORKOUTS_URL)
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not load workouts')
+        return
+      }
+
+      setWorkouts(await response.json())
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
+  }
+
+  // guests have no real token to authenticate with, so skip the fetch and just show an empty list
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchWorkouts()
+    }
+  }, [])
 
   const filteredWorkouts = workouts.filter((workout) =>
     workout.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleDelete = (id) => {
-    console.log('Delete workout:', id)
-    // API call goes here once auth/login is sorted, just logging for now so we can see the shape
+  const handleDelete = async (id) => {
+    if (!isAuthenticated()) {
+      setError('Sign in to manage workouts')
+      return
+    }
+    setError('')
+
+    try {
+      const response = await authFetch(`${WORKOUTS_URL}${id}/`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not delete workout')
+        return
+      }
+
+      setWorkouts((prev) => prev.filter((workout) => workout.id !== id))
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
   }
 
   return (
     <div className="history">
+      {error && <p className="form-error">{error}</p>}
+
       <div className="history-search">
         <input
           type="text"

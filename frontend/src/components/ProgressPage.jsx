@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,32 +10,26 @@ import {
   CartesianGrid,
   Tooltip
 } from 'recharts'
+import { isAuthenticated, authFetch } from '../auth'
+import { kgToLbs } from '../utils/units'
 
-// TODO: replace with useState + useEffect/fetch() to GET /api/progress/weight-progression/<exercise_id>/ once auth is wired up
-const mockWeightProgression = [
-  { date: '2026-07-01', weight_kg: 15 },
-  { date: '2026-07-08', weight_kg: 17.5 },
-  { date: '2026-07-15', weight_kg: 20 },
-  { date: '2026-07-22', weight_kg: 20 }
-]
+const PROGRESS_URL = 'http://localhost:8000/api/progress/'
 
-// TODO: replace with useState + useEffect/fetch() to GET /api/progress/frequency/ once auth is wired up
-const mockFrequency = [
-  { week_start: '2026-07-20', workout_count: 3 },
-  { week_start: '2026-07-13', workout_count: 2 }
-]
+// TODO: replace with useState + useEffect/fetch() to GET /api/progress/weight-progression/<exercise_id>/, filtered by the selected exercise, once that endpoint exists
+const mockWeightProgressionByExercise = {
+  'Dumbbell Shoulder Press': [
+    { date: '2026-07-01', weight_kg: 15 },
+    { date: '2026-07-08', weight_kg: 17.5 },
+    { date: '2026-07-15', weight_kg: 20 }
+  ],
+  'Bench Press': [
+    { date: '2026-07-01', weight_kg: 30 },
+    { date: '2026-07-10', weight_kg: 35 },
+    { date: '2026-07-20', weight_kg: 45 }
+  ]
+}
 
-// TODO: replace with useState + useEffect/fetch() to GET /api/progress/records/ once auth is wired up
-const mockRecords = [
-  { exercise_name: 'Dumbbell Shoulder Press', max_weight: 20, date: '2026-07-22' },
-  { exercise_name: 'Bench Press', max_weight: 45, date: '2026-07-20' }
-]
-
-// TODO: replace with useState + useEffect/fetch() to GET /api/progress/comparison/ once auth is wired up
-const mockComparison = [
-  { period: 'current', workouts: 3, steps: 17600, calories: 970 },
-  { period: 'previous', workouts: 2, steps: 12000, calories: 700 }
-]
+const STRENGTH_EXERCISES = Object.keys(mockWeightProgressionByExercise)
 
 // ISO dates only ever carry month/day/year here, so no year needed in the display (e.g. "2026-07-22" -> "Jul 22").
 // timeZone: 'UTC' keeps date-only strings from shifting a day when the browser's local zone is negative UTC.
@@ -58,13 +53,93 @@ const tooltipStyle = {
 }
 
 function ProgressPage() {
+  const [selectedExercise, setSelectedExercise] = useState(STRENGTH_EXERCISES[0])
+  // Backend data is always kg; convert to lbs here for display only.
+  const weightProgression = mockWeightProgressionByExercise[selectedExercise].map(
+    (point) => ({ ...point, weight_lbs: kgToLbs(point.weight_kg) })
+  )
+
+  const [frequency, setFrequency] = useState([])
+  const [records, setRecords] = useState([])
+  const [comparison, setComparison] = useState([])
+  const [error, setError] = useState('')
+
+  const fetchFrequency = async () => {
+    try {
+      const response = await authFetch(`${PROGRESS_URL}workout-frequency/`)
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not load workout frequency')
+        return
+      }
+
+      setFrequency(await response.json())
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
+  }
+
+  const fetchRecords = async () => {
+    try {
+      const response = await authFetch(`${PROGRESS_URL}personal-records/`)
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not load personal records')
+        return
+      }
+
+      setRecords(await response.json())
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
+  }
+
+  const fetchComparison = async () => {
+    try {
+      const response = await authFetch(`${PROGRESS_URL}comparison/?period=week`)
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not load comparison')
+        return
+      }
+
+      setComparison(await response.json())
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
+  }
+
+  // guests have no real token to authenticate with, so skip the fetches and just show empty sections
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchFrequency()
+      fetchRecords()
+      fetchComparison()
+    }
+  }, [])
+
   return (
     <div className="progress">
-      {/* required by Requirements Doc 2.6: weight progression per exercise */}
+      {error && <p className="form-error">{error}</p>}
+
+      {/* required by Requirements Doc 2.6: weight progression per exercise (strength only) */}
       <div className="progress-section">
         <h2>Weight Progression</h2>
+        <select
+          value={selectedExercise}
+          onChange={(e) => setSelectedExercise(e.target.value)}
+        >
+          {STRENGTH_EXERCISES.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={mockWeightProgression}>
+          <LineChart data={weightProgression}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="date"
@@ -75,8 +150,8 @@ function ProgressPage() {
             <Tooltip {...tooltipStyle} />
             <Line
               type="monotone"
-              dataKey="weight_kg"
-              name="Weight (kg)"
+              dataKey="weight_lbs"
+              name="Weight (lbs)"
               stroke="var(--accent)"
               strokeWidth={2}
               dot={{ fill: 'var(--accent)' }}
@@ -89,7 +164,7 @@ function ProgressPage() {
       <div className="progress-section">
         <h2>Workout Frequency</h2>
         <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={mockFrequency}>
+          <BarChart data={frequency}>
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="week_start"
@@ -109,15 +184,15 @@ function ProgressPage() {
           <thead>
             <tr>
               <th>Exercise</th>
-              <th>Max Weight (kg)</th>
+              <th>Max Weight (lbs)</th>
               <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            {mockRecords.map((record) => (
+            {records.map((record) => (
               <tr key={record.exercise_name}>
                 <td>{record.exercise_name}</td>
-                <td>{record.max_weight}</td>
+                <td>{kgToLbs(record.max_weight)}</td>
                 <td>{formatDate(record.date)}</td>
               </tr>
             ))}
@@ -139,7 +214,7 @@ function ProgressPage() {
               </tr>
             </thead>
             <tbody>
-              {mockComparison.map((row) => (
+              {comparison.map((row) => (
                 <tr key={row.period}>
                   <td className="progress-period">{row.period}</td>
                   <td>{row.workouts}</td>

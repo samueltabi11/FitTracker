@@ -6,16 +6,36 @@
   padding: 0 20px 40px;
 }
 
-/* keeping the nav bar styling simple, real layout comes once there's more than 3 links */
 nav {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 16px 24px;
   width: 100%;
-  max-width: 480px;
-  padding: 20px 0;
+  max-width: 1080px;
+  padding: 28px 0;
   border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  height: 68px;
+  width: auto;
+  display: block;
+  margin-right: 16px;
+}
+
+.nav-logo-clickable {
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 12px 24px;
+  min-width: 0;
 }
 
 nav a {
@@ -23,6 +43,7 @@ nav a {
   text-decoration: none;
   font-size: 15px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 nav a:hover {
@@ -35,19 +56,21 @@ nav a.active {
   padding-bottom: 2px;
 }
 
-nav button {
+nav button.nav-logout {
   margin-left: auto;
-  padding: 0;
+  padding: 0 0 0 24px;
   font: inherit;
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
   background: none;
   border: none;
+  border-left: 1px solid var(--border);
   cursor: pointer;
+  white-space: nowrap;
 }
 
-nav button:hover {
+nav button.nav-logout:hover {
   color: var(--text-h);
 }
 

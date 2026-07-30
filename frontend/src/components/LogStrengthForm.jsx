@@ -1,4 +1,9 @@
 import { useState } from 'react'
+import { isAuthenticated, authFetch } from '../auth'
+import { lbsToKg } from '../utils/units'
+
+const WORKOUTS_URL = 'http://localhost:8000/api/workouts/'
+const EXERCISES_URL = 'http://localhost:8000/api/exercises/'
 
 const STRENGTH_EXERCISES = [
   'Bench Press',
@@ -13,6 +18,38 @@ const STRENGTH_EXERCISES = [
 
 const OTHER_EXERCISE = 'other'
 
+// Exercises are stored by id on the backend (Workout -> WorkoutExercise -> Exercise FK),
+// so look up an existing exercise by name/category, or create it if this is the first
+// time it's been logged (covers both the preset list and a custom "other" entry).
+async function resolveExerciseId(name, category) {
+  const searchResponse = await authFetch(
+    `${EXERCISES_URL}?search=${encodeURIComponent(name)}&category=${category}`
+  )
+
+  if (searchResponse.ok) {
+    const results = await searchResponse.json()
+    const match = results.find(
+      (exercise) => exercise.name.toLowerCase() === name.toLowerCase()
+    )
+    if (match) {
+      return match.id
+    }
+  }
+
+  const createResponse = await authFetch(EXERCISES_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, category })
+  })
+
+  if (!createResponse.ok) {
+    throw new Error('Could not resolve exercise')
+  }
+
+  const created = await createResponse.json()
+  return created.id
+}
+
 // strength's own form since it's a separate table on the backend (sets/reps/weight live here, cardio doesn't have these)
 function LogStrengthForm() {
   const [workoutName, setWorkoutName] = useState('')
@@ -25,15 +62,20 @@ function LogStrengthForm() {
   const exerciseName =
     exerciseSelection === OTHER_EXERCISE ? customExerciseName : exerciseSelection
 
+  // weight_lbs holds what the user types (display unit); it's converted to weight_kg
+  // only when building the payload sent to the backend.
   const [sets, setSets] = useState([
-    { set_number: 1, reps: '', weight_kg: '', is_completed: false }
+    { set_number: 1, reps: '', weight_lbs: '', is_completed: false }
   ])
+
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   // just tacks on another blank set, numbering is based on however many are already there
   const addSet = () => {
     setSets([
       ...sets,
-      { set_number: sets.length + 1, reps: '', weight_kg: '', is_completed: false }
+      { set_number: sets.length + 1, reps: '', weight_lbs: '', is_completed: false }
     ])
   }
 
@@ -51,36 +93,70 @@ function LogStrengthForm() {
     setSets(updatedSets)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const workoutData = {
-      name: workoutName,
-      workout_type: 'strength',
-      date: date,
-      duration_minutes: parseInt(duration),
-      notes: notes,
-      exercises: [
-        {
-          exercise: exerciseName,
-          order: 0,
-          sets: sets.map((set) => ({
-            set_number: set.set_number,
-            reps: parseInt(set.reps),
-            weight_kg: parseFloat(set.weight_kg),
-            is_completed: set.is_completed
-          }))
-        }
-      ]
+    if (!isAuthenticated()) {
+      setError('Sign in to log workouts')
+      return
     }
+    setError('')
+    setSuccess('')
 
-    console.log('Workout data ready to send:', workoutData)
-    // API call goes here once auth/login is sorted, just logging for now so we can see the shape
+    try {
+      const exerciseId = await resolveExerciseId(exerciseName, 'strength')
+
+      const workoutData = {
+        name: workoutName,
+        workout_type: 'strength',
+        date: date,
+        duration_minutes: parseInt(duration),
+        notes: notes,
+        exercises: [
+          {
+            exercise: exerciseId,
+            order: 0,
+            sets: sets.map((set) => ({
+              set_number: set.set_number,
+              reps: parseInt(set.reps),
+              weight_kg: lbsToKg(parseFloat(set.weight_lbs)),
+              is_completed: set.is_completed
+            }))
+          }
+        ]
+      }
+
+      const response = await authFetch(WORKOUTS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(workoutData)
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not save workout')
+        return
+      }
+
+      setSuccess('Workout saved!')
+      setWorkoutName('')
+      setDate('')
+      setDuration('')
+      setNotes('')
+      setExerciseSelection(STRENGTH_EXERCISES[0])
+      setCustomExerciseName('')
+      setSets([{ set_number: 1, reps: '', weight_lbs: '', is_completed: false }])
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <h2>Log Strength Workout</h2>
+
+      {error && <p className="form-error">{error}</p>}
+      {success && <p className="form-success">{success}</p>}
 
       <div>
         <label>Workout Name</label>
@@ -150,9 +226,9 @@ function LogStrengthForm() {
           />
           <input
             type="number"
-            placeholder="Weight (kg)"
-            value={set.weight_kg}
-            onChange={(e) => updateSet(index, 'weight_kg', e.target.value)}
+            placeholder="Weight (lbs)"
+            value={set.weight_lbs}
+            onChange={(e) => updateSet(index, 'weight_lbs', e.target.value)}
             required
           />
           {sets.length > 1 && (

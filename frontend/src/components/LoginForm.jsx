@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { TOKEN_KEY, continueAsGuest } from '../auth'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { TOKEN_KEY, REFRESH_TOKEN_KEY, GUEST_KEY, hasAccess, continueAsGuest } from '../auth'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -8,6 +8,12 @@ function LoginForm() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+
+  // already signed in (real or guest) — visiting /login directly shouldn't be
+  // possible to re-enter through, since that's how guest/real tokens end up mixed
+  if (hasAccess()) {
+    return <Navigate to="/" replace />
+  }
 
   const handleGuest = () => {
     continueAsGuest()
@@ -32,7 +38,9 @@ function LoginForm() {
         return
       }
 
+      localStorage.removeItem(GUEST_KEY)
       localStorage.setItem(TOKEN_KEY, data.access)
+      localStorage.setItem(REFRESH_TOKEN_KEY, data.refresh)
       navigate('/')
     } catch {
       setError('Could not reach the server, please try again')

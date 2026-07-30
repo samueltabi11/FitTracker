@@ -4,6 +4,7 @@ import Nav from './components/Nav'
 import Dashboard from './components/Dashboard'
 import LogStrengthForm from './components/LogStrengthForm'
 import LogCardioForm from './components/LogCardioForm'
+import LogActivityPage from './components/LogActivityPage'
 import GoalsPage from './components/GoalsPage'
 import ProgressPage from './components/ProgressPage'
 import HistoryPage from './components/HistoryPage'
@@ -38,6 +39,14 @@ function App() {
           element={
             <ProtectedRoute>
               <LogCardioForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/log-activity"
+          element={
+            <ProtectedRoute>
+              <LogActivityPage />
             </ProtectedRoute>
           }
         />
