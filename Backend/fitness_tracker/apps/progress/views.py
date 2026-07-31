@@ -11,7 +11,8 @@ from .serializers import (
     WeightTrendSerializer,
     WorkoutFrequencySerializer,
     PRSerializer,
-    ComparisonSerializer
+    ComparisonSerializer,
+    WeightProgressionSerializer,
 )
 
 
@@ -81,6 +82,33 @@ class PersonalRecordsView(APIView):
         serializer = PRSerializer(data, many=True)
         return Response(serializer.data)
 
+class WeightProgressionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, exercise_id):
+        sets = (
+            WorkoutSet.objects.filter(
+                workout_exercise__workout__user=request.user,
+                workout_exercise__exercise_id=exercise_id,
+                weight_kg__isnull=False,
+            )
+            .values(
+                "workout_exercise__workout__date",
+                "weight_kg",
+            )
+            .order_by("workout_exercise__workout__date")
+        )
+
+        data = [
+            {
+                "date": s["workout_exercise__workout__date"],
+                "weight_kg": s["weight_kg"],
+            }
+            for s in sets
+        ]
+
+        serializer = WeightProgressionSerializer(data, many=True)
+        return Response(serializer.data)
 
 class ComparisonView(APIView):
     permission_classes = [permissions.IsAuthenticated]

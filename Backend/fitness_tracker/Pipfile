@@ -8,8 +8,9 @@ python-dotenv = "*"
 djangorestframework-simplejwt = "*"
 django-cors-headers = "*"
 django-filter = "*"
+psycopg2-binary = "*"
 dj-database-url = "*"
-psycopg = {extras = ["binary"], version = "*"}
+gunicorn = "*"
 
 [dev-packages]
 
