@@ -1,5 +1,17 @@
 import { useState } from 'react'
 
+const CARDIO_EXERCISES = [
+  'Running',
+  'Cycling',
+  'Rowing',
+  'Swimming',
+  'Jump Rope',
+  'Elliptical',
+  'Walking'
+]
+
+const OTHER_EXERCISE = 'other'
+
 // cardio's own form since it's a separate table on the backend (no sets/reps/weight here, that's strength only)
 function LogCardioForm() {
   const [workoutName, setWorkoutName] = useState('')
@@ -7,7 +19,11 @@ function LogCardioForm() {
   const [duration, setDuration] = useState('')
   const [notes, setNotes] = useState('')
 
-  const [exerciseName, setExerciseName] = useState('')
+  const [exerciseSelection, setExerciseSelection] = useState(CARDIO_EXERCISES[0])
+  const [customExerciseName, setCustomExerciseName] = useState('')
+  const exerciseName =
+    exerciseSelection === OTHER_EXERCISE ? customExerciseName : exerciseSelection
+
   const [distance, setDistance] = useState('')
   const [difficulty, setDifficulty] = useState('')
 
@@ -70,12 +86,27 @@ function LogCardioForm() {
 
       <div>
         <label>Exercise Name</label>
-        <input
-          type="text"
-          value={exerciseName}
-          onChange={(e) => setExerciseName(e.target.value)}
+        <select
+          value={exerciseSelection}
+          onChange={(e) => setExerciseSelection(e.target.value)}
           required
-        />
+        >
+          {CARDIO_EXERCISES.map((exercise) => (
+            <option key={exercise} value={exercise}>
+              {exercise}
+            </option>
+          ))}
+          <option value={OTHER_EXERCISE}>Other (type your own)</option>
+        </select>
+        {exerciseSelection === OTHER_EXERCISE && (
+          <input
+            type="text"
+            placeholder="Enter exercise name"
+            value={customExerciseName}
+            onChange={(e) => setCustomExerciseName(e.target.value)}
+            required
+          />
+        )}
       </div>
 
       <div>

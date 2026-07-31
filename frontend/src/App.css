@@ -9,6 +9,8 @@
 /* keeping the nav bar styling simple, real layout comes once there's more than 3 links */
 nav {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 24px;
   width: 100%;
   max-width: 480px;
@@ -33,24 +35,60 @@ nav a.active {
   padding-bottom: 2px;
 }
 
+nav button {
+  margin-left: auto;
+  padding: 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+nav button:hover {
+  color: var(--text-h);
+}
+
 .dashboard {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 12px;
   width: 100%;
   max-width: 480px;
+  text-align: left;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+  box-sizing: border-box;
+}
+
+.dashboard a {
+  display: block;
+  text-decoration: none;
 }
 
 .dashboard button {
-  padding: 10px 16px;
+  width: 100%;
+  padding: 14px 16px;
   font: inherit;
+  font-size: 16px;
   font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
   background: transparent;
   color: var(--text-h);
   border: 1px solid var(--border);
+  box-sizing: border-box;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dashboard button:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
 }
 
 /* keeping this flat on purpose, no shadow/big radius - was looking too "generic AI dashboard" before */
@@ -93,6 +131,11 @@ form > div:has(span) input {
   min-width: 100px;
 }
 
+form > div:has(span) button {
+  padding: 6px 12px;
+  font-size: 14px;
+}
+
 form label {
   font-size: 14px;
   font-weight: 500;
@@ -100,7 +143,8 @@ form label {
 }
 
 form input,
-form textarea {
+form textarea,
+form select {
   width: 100%;
   padding: 10px 12px;
   font: inherit;
@@ -112,7 +156,8 @@ form textarea {
 }
 
 form input:focus,
-form textarea:focus {
+form textarea:focus,
+form select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-bg);
@@ -149,4 +194,266 @@ form button[type='submit'] {
   color: var(--accent-fg);
   border: none;
   margin-top: 4px;
+}
+
+form .form-error,
+form .form-success {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+form .form-error {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+form .form-success {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+}
+
+.goals {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+}
+
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+}
+
+.goal-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goal-type {
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.goal-card-header button {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+}
+
+.goal-progress,
+.goal-date {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+  box-sizing: border-box;
+}
+
+.progress-section h2 {
+  margin: 0;
+}
+
+.progress-section select {
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.progress-section select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.progress-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.progress-section th,
+.progress-section td {
+  padding: 8px 4px;
+  text-align: left;
+  font-size: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-section th {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.progress-section td {
+  color: var(--text-h);
+}
+
+.progress-section tr:last-child td {
+  border-bottom: none;
+}
+
+.progress-period {
+  text-transform: capitalize;
+}
+
+.progress-extra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--border);
+}
+
+.progress-extra .progress-section {
+  max-width: none;
+}
+
+.history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+}
+
+.history .form-error {
+  width: 100%;
+  max-width: 480px;
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.history-search {
+  width: 100%;
+  max-width: 480px;
+}
+
+.history-search input {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.history-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
+}
+
+.workout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+}
+
+.workout-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workout-name {
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.workout-card-header button {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+}
+
+.workout-meta {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.history-empty {
+  color: var(--text);
+  font-size: 15px;
 }

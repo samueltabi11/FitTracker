@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from dotenv import load_dotenv
+import dj_database_url
 
 # Load environment variables from .env file
 
@@ -101,9 +102,14 @@ WSGI_APPLICATION = 'fitness_tracker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    raise Exception("DATABASE_URL environment variable is not configured")
+
 DATABASES = {
     "default": dj_database_url.parse(
-        os.getenv("DATABASE_URL"),
+        DATABASE_URL,
         conn_max_age=600,
         ssl_require=True,
     )

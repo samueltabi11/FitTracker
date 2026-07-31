@@ -13,14 +13,16 @@ class WorkoutSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkoutSet
         fields = '__all__'
+        read_only_fields = ('workout_exercise',)
 
 
 class WorkoutExerciseSerializer(serializers.ModelSerializer):
     sets = WorkoutSetSerializer(many=True)
-    
+
     class Meta:
         model = WorkoutExercise
         fields = '__all__'
+        read_only_fields = ('workout',)
 
 
 class WorkoutSerializer(serializers.ModelSerializer):
