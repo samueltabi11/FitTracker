@@ -495,6 +495,37 @@ form .form-success {
   color: var(--text-h);
 }
 
+/* the inline edit fields on a workout-card aren't inside a <form>, so they
+   miss the `form label`/`form input` rules entirely - mirror them here */
+.workout-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.workout-edit-field label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.workout-edit-field input {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.workout-edit-field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
 .workout-card-header button {
   padding: 6px 12px;
   font: inherit;
@@ -513,8 +544,86 @@ form .form-success {
   border-color: var(--accent-border);
 }
 
+/* overrides the generic card-header button chrome above - this one needs to
+   read as plain clickable text, not a button, since it's the expand toggle */
+.workout-card-header .workout-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  min-width: 0;
+}
+
+.workout-card-header .workout-toggle:hover {
+  background: none;
+  border: none;
+}
+
+.workout-card-header .workout-toggle:hover .workout-name {
+  color: var(--accent);
+}
+
+.workout-expand-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text);
+}
+
 .workout-meta {
   font-size: 15px;
+  color: var(--text);
+}
+
+.workout-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.workout-detail-loading {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.workout-exercise {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workout-exercise-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.workout-sets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.workout-sets li {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.workout-detail-notes {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-style: italic;
   color: var(--text);
 }
 

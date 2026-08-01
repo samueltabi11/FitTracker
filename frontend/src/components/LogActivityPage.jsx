@@ -216,7 +216,7 @@ function LogActivityPage() {
                   <div className="workout-card-header">
                     <span className="workout-name">{formatDate(activity.date)}</span>
                   </div>
-                  <div>
+                  <div className="workout-edit-field">
                     <label>Steps</label>
                     <input
                       type="number"
@@ -225,7 +225,7 @@ function LogActivityPage() {
                       required
                     />
                   </div>
-                  <div>
+                  <div className="workout-edit-field">
                     <label>Calories Burned</label>
                     <input
                       type="number"
