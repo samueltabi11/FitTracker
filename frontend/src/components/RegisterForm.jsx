@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { API_BASE_URL } from '../auth'
+import { extractErrorMessage } from '../utils/errors'
 
 function RegisterForm() {
   const navigate = useNavigate()
@@ -30,10 +31,9 @@ function RegisterForm() {
         })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        setError(data.detail || JSON.stringify(data))
+        const data = await response.json().catch(() => null)
+        setError(extractErrorMessage(data, 'Could not create account, please check the form and try again'))
         return
       }
 

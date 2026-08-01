@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
+import { extractErrorMessage } from '../utils/errors'
+import ConfirmModal from './ConfirmModal'
 
 const GOAL_TYPES = [
   { value: 'daily_steps', label: 'Daily Steps' },
@@ -24,6 +26,7 @@ function GoalsPage() {
 
   const [goals, setGoals] = useState([])
   const [error, setError] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   // The list endpoint returns whatever current_value/progress_percentage was last
   // stored, which is stale for goal types the backend recalculates on demand
@@ -49,7 +52,7 @@ function GoalsPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not load goals')
+        setError(extractErrorMessage(data, 'Could not load goals'))
         return
       }
 
@@ -95,7 +98,7 @@ function GoalsPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not save goal')
+        setError(extractErrorMessage(data, 'Could not save goal, please check the form and try again'))
         return
       }
 
@@ -107,11 +110,17 @@ function GoalsPage() {
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleDeleteClick = (id) => {
     if (!isAuthenticated()) {
       setError('Sign in to manage goals')
       return
     }
+    setConfirmDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    const id = confirmDeleteId
+    setConfirmDeleteId(null)
     setError('')
 
     try {
@@ -121,7 +130,7 @@ function GoalsPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not delete goal')
+        setError(extractErrorMessage(data, 'Could not delete goal'))
         return
       }
 
@@ -183,7 +192,7 @@ function GoalsPage() {
               <span className="goal-type">
                 {GOAL_TYPE_LABELS[goal.goal_type] || goal.goal_type}
               </span>
-              <button type="button" onClick={() => handleDelete(goal.id)}>
+              <button type="button" className="btn-danger" onClick={() => handleDeleteClick(goal.id)}>
                 Delete
               </button>
             </div>
@@ -200,6 +209,13 @@ function GoalsPage() {
           </div>
         ))}
       </div>
+
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        title="Delete this goal?"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

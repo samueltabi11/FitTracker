@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
+import { extractErrorMessage } from '../utils/errors'
+import ConfirmModal from './ConfirmModal'
 
 const WORKOUTS_URL = `${API_BASE_URL}/api/workouts/`
 
@@ -16,6 +18,7 @@ function HistoryPage() {
   const [workouts, setWorkouts] = useState([])
   const [search, setSearch] = useState('')
   const [error, setError] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   const fetchWorkouts = async () => {
     try {
@@ -23,7 +26,7 @@ function HistoryPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not load workouts')
+        setError(extractErrorMessage(data, 'Could not load workouts'))
         return
       }
 
@@ -44,14 +47,17 @@ function HistoryPage() {
     workout.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleDelete = async (id) => {
+  const handleDeleteClick = (id) => {
     if (!isAuthenticated()) {
       setError('Sign in to manage workouts')
       return
     }
-    if (!window.confirm('Delete this workout?')) {
-      return
-    }
+    setConfirmDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    const id = confirmDeleteId
+    setConfirmDeleteId(null)
     setError('')
 
     try {
@@ -61,7 +67,7 @@ function HistoryPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not delete workout')
+        setError(extractErrorMessage(data, 'Could not delete workout'))
         return
       }
 
@@ -73,6 +79,8 @@ function HistoryPage() {
 
   return (
     <div className="history">
+      <h2>Workout History</h2>
+
       {error && <p className="form-error">{error}</p>}
 
       <div className="history-search">
@@ -89,7 +97,7 @@ function HistoryPage() {
           <div className="workout-card" key={workout.id}>
             <div className="workout-card-header">
               <span className="workout-name">{workout.name}</span>
-              <button type="button" onClick={() => handleDelete(workout.id)}>
+              <button type="button" className="btn-danger" onClick={() => handleDeleteClick(workout.id)}>
                 Delete
               </button>
             </div>
@@ -103,6 +111,13 @@ function HistoryPage() {
           <div className="history-empty">No workouts found.</div>
         )}
       </div>
+
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        title="Delete this workout?"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
     </div>
   )
 }

@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
+import { extractErrorMessage } from '../utils/errors'
+import ConfirmModal from './ConfirmModal'
 
 const ACTIVITY_URL = `${API_BASE_URL}/api/activity/`
 
@@ -16,19 +18,6 @@ function formatDate(isoDate) {
   })
 }
 
-// Pulls a single readable message out of a parsed error response instead of
-// falling back to a raw JSON dump - data is null when the body wasn't JSON at
-// all (e.g. a server crash page), and {} stringifies to a useless "{}".
-function extractErrorMessage(data, fallback) {
-  if (!data) return fallback
-  if (data.detail) return data.detail
-  if (Array.isArray(data.non_field_errors) && data.non_field_errors.length > 0) {
-    return data.non_field_errors[0]
-  }
-  const firstFieldError = Object.values(data).flat().find(Boolean)
-  return firstFieldError || fallback
-}
-
 function LogActivityPage() {
   const [date, setDate] = useState(todayDate())
   const [steps, setSteps] = useState('')
@@ -43,6 +32,8 @@ function LogActivityPage() {
   const [editingId, setEditingId] = useState(null)
   const [editSteps, setEditSteps] = useState('')
   const [editCalories, setEditCalories] = useState('')
+
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   const fetchActivities = async () => {
     try {
@@ -141,6 +132,36 @@ function LogActivityPage() {
     }
   }
 
+  const handleDeleteClick = (id) => {
+    if (!isAuthenticated()) {
+      setHistoryError('Sign in to manage activity')
+      return
+    }
+    setConfirmDeleteId(id)
+  }
+
+  const confirmDelete = async () => {
+    const id = confirmDeleteId
+    setConfirmDeleteId(null)
+    setHistoryError('')
+
+    try {
+      const response = await authFetch(`${ACTIVITY_URL}${id}/`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        setHistoryError(extractErrorMessage(data, 'Could not delete activity'))
+        return
+      }
+
+      setActivities((prev) => prev.filter((activity) => activity.id !== id))
+    } catch {
+      setHistoryError('Could not reach the server, please try again')
+    }
+  }
+
   return (
     <>
       <form onSubmit={handleSubmit}>
@@ -214,7 +235,7 @@ function LogActivityPage() {
                     />
                   </div>
                   <div className="workout-card-header">
-                    <button type="button" onClick={() => saveEdit(activity.id)}>
+                    <button type="button" className="btn-primary" onClick={() => saveEdit(activity.id)}>
                       Save
                     </button>
                     <button type="button" onClick={cancelEdit}>
@@ -229,6 +250,9 @@ function LogActivityPage() {
                     <button type="button" onClick={() => startEdit(activity)}>
                       Edit
                     </button>
+                    <button type="button" className="btn-danger" onClick={() => handleDeleteClick(activity.id)}>
+                      Delete
+                    </button>
                   </div>
                   <div className="workout-meta">
                     {activity.steps} steps · {activity.calories_burned ?? 0} cal
@@ -242,6 +266,13 @@ function LogActivityPage() {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmDeleteId !== null}
+        title="Delete this activity entry?"
+        onCancel={() => setConfirmDeleteId(null)}
+        onConfirm={confirmDelete}
+      />
     </>
   )
 }

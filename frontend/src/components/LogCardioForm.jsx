@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { milesToKm } from '../utils/units'
+import { extractErrorMessage } from '../utils/errors'
 
 const WORKOUTS_URL = `${API_BASE_URL}/api/workouts/`
 const EXERCISES_URL = `${API_BASE_URL}/api/exercises/`
@@ -114,7 +115,7 @@ function LogCardioForm() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not save workout')
+        setError(extractErrorMessage(data, 'Could not save workout, please check the form and try again'))
         return
       }
 

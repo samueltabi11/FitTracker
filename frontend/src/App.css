@@ -11,10 +11,13 @@ nav {
   align-items: center;
   flex-wrap: wrap;
   gap: 16px 24px;
-  width: 100%;
-  max-width: 1080px;
-  padding: 28px 0;
-  border-bottom: 1px solid var(--border);
+  width: calc(100% + 40px);
+  margin: 0 -20px 16px;
+  padding: 24px 20px;
+  background: var(--code-bg);
+  box-shadow: var(--shadow);
+  border-radius: 0 0 12px 12px;
+  box-sizing: border-box;
 }
 
 .nav-logo {
@@ -204,6 +207,7 @@ form button {
   font-weight: 500;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
 }
 
 form button[type='button'] {
@@ -212,11 +216,22 @@ form button[type='button'] {
   border: 1px solid var(--border);
 }
 
+form button[type='button']:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+/* the primary action on every form - filled so it reads as the one thing to click */
 form button[type='submit'] {
   background: var(--accent);
   color: var(--accent-fg);
   border: none;
   margin-top: 4px;
+  font-weight: 600;
+}
+
+form button[type='submit']:hover {
+  opacity: 0.88;
 }
 
 form .form-error,
@@ -243,27 +258,29 @@ form .form-success {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
   width: 100%;
 }
 
 .goals-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
   max-width: 480px;
   text-align: left;
 }
 
+/* flatter than the primary form card on purpose - these are secondary,
+   read-mostly rows, so they should recede rather than compete with it */
 .goal-card {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--code-bg);
+  border-radius: 6px;
+  background: var(--bg);
 }
 
 .goal-card-header {
@@ -274,7 +291,8 @@ form .form-success {
 }
 
 .goal-type {
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-h);
 }
 
@@ -288,6 +306,12 @@ form .form-success {
   background: transparent;
   color: var(--text-h);
   border: 1px solid var(--border);
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.goal-card-header button:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
 }
 
 .goal-progress,
@@ -300,7 +324,7 @@ form .form-success {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
   width: 100%;
 }
 
@@ -389,8 +413,17 @@ form .form-success {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 28px;
   width: 100%;
+}
+
+/* .history is a centered flex column (like its .history-search/.history-list
+   children), so the heading needs the same width cap + left-aligned text to
+   match the rest of the app's section titles instead of sitting centered */
+.history > h2 {
+  width: 100%;
+  max-width: 480px;
+  text-align: left;
 }
 
 .history .form-error {
@@ -431,20 +464,22 @@ form .form-success {
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
   max-width: 480px;
   text-align: left;
 }
 
+/* flatter than the primary form card on purpose - these are secondary,
+   read-mostly rows, so they should recede rather than compete with it */
 .workout-card {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--code-bg);
+  border-radius: 6px;
+  background: var(--bg);
 }
 
 .workout-card-header {
@@ -455,7 +490,8 @@ form .form-success {
 }
 
 .workout-name {
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--text-h);
 }
 
@@ -469,6 +505,12 @@ form .form-success {
   background: transparent;
   color: var(--text-h);
   border: 1px solid var(--border);
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.workout-card-header button:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
 }
 
 .workout-meta {
@@ -479,4 +521,102 @@ form .form-success {
 .history-empty {
   color: var(--text);
   font-size: 15px;
+}
+
+/* Destructive action gets its own subtle color so it doesn't blend in with
+   neutral Edit/Cancel buttons - reuses the same red already used for
+   .form-error so it reads as "the same kind of warning" across the app. */
+.goal-card-header .btn-danger,
+.workout-card-header .btn-danger,
+.modal-actions .btn-danger {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.goal-card-header .btn-danger:hover,
+.workout-card-header .btn-danger:hover,
+.modal-actions .btn-danger:hover {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.55);
+}
+
+/* Mirrors the filled form submit button so a "Save" action reads as primary
+   even outside of a <form> (e.g. confirming an inline edit). */
+.workout-card-header .btn-primary {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: transparent;
+}
+
+.workout-card-header .btn-primary:hover {
+  background: var(--accent);
+  opacity: 0.88;
+}
+
+/* Stands in for window.confirm() so delete confirmations match the app's
+   own dark theme instead of the browser's native dialog chrome. */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+  text-align: left;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+}
+
+.modal h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.modal-message {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.modal-actions button:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
 }

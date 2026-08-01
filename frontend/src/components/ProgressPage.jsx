@@ -12,6 +12,7 @@ import {
 } from 'recharts'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { kgToLbs } from '../utils/units'
+import { extractErrorMessage } from '../utils/errors'
 
 const PROGRESS_URL = `${API_BASE_URL}/api/progress/`
 const EXERCISES_URL = `${API_BASE_URL}/api/exercises/`
@@ -99,7 +100,7 @@ function ProgressPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not load weight progression')
+        setError(extractErrorMessage(data, 'Could not load weight progression'))
         return
       }
 
@@ -115,7 +116,7 @@ function ProgressPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not load workout frequency')
+        setError(extractErrorMessage(data, 'Could not load workout frequency'))
         return
       }
 
@@ -131,7 +132,7 @@ function ProgressPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not load personal records')
+        setError(extractErrorMessage(data, 'Could not load personal records'))
         return
       }
 
@@ -147,7 +148,7 @@ function ProgressPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
-        setError(data.detail || JSON.stringify(data) || 'Could not load comparison')
+        setError(extractErrorMessage(data, 'Could not load your weekly comparison'))
         return
       }
 

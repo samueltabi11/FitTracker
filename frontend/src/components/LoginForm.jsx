@@ -34,7 +34,7 @@ function LoginForm() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError('Invalid username or password')
+        setError('Incorrect username or password')
         return
       }
 
