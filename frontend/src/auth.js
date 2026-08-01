@@ -1,3 +1,5 @@
+export const API_BASE_URL = 'http://localhost:8000'
+
 export const TOKEN_KEY = 'fittracker_token'
 export const REFRESH_TOKEN_KEY = 'fittracker_refresh_token'
 export const GUEST_KEY = 'fittracker_guest'
@@ -35,7 +37,7 @@ export async function refreshAccessToken() {
   }
 
   try {
-    const response = await fetch('http://localhost:8000/api/auth/refresh/', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh: refreshToken })

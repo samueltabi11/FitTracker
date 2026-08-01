@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { isAuthenticated, authFetch } from '../auth'
+import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 
 const GOAL_TYPES = [
   { value: 'daily_steps', label: 'Daily Steps' },
@@ -15,7 +15,7 @@ const GOAL_TYPE_LABELS = {
   target_weight: 'Target Weight'
 }
 
-const GOALS_URL = 'http://localhost:8000/api/goals/'
+const GOALS_URL = `${API_BASE_URL}/api/goals/`
 
 function GoalsPage() {
   const [goalType, setGoalType] = useState(GOAL_TYPES[0].value)

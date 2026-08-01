@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { TOKEN_KEY, REFRESH_TOKEN_KEY, GUEST_KEY, hasAccess, continueAsGuest } from '../auth'
+import { API_BASE_URL, TOKEN_KEY, REFRESH_TOKEN_KEY, GUEST_KEY, hasAccess, continueAsGuest } from '../auth'
 
 function LoginForm() {
   const navigate = useNavigate()
@@ -25,7 +25,7 @@ function LoginForm() {
     setError('')
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/login/', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })

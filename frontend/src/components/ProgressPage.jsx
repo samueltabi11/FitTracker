@@ -10,26 +10,41 @@ import {
   CartesianGrid,
   Tooltip
 } from 'recharts'
-import { isAuthenticated, authFetch } from '../auth'
+import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { kgToLbs } from '../utils/units'
 
-const PROGRESS_URL = 'http://localhost:8000/api/progress/'
+const PROGRESS_URL = `${API_BASE_URL}/api/progress/`
+const EXERCISES_URL = `${API_BASE_URL}/api/exercises/`
 
-// TODO: replace with useState + useEffect/fetch() to GET /api/progress/weight-progression/<exercise_id>/, filtered by the selected exercise, once that endpoint exists
-const mockWeightProgressionByExercise = {
-  'Dumbbell Shoulder Press': [
-    { date: '2026-07-01', weight_kg: 15 },
-    { date: '2026-07-08', weight_kg: 17.5 },
-    { date: '2026-07-15', weight_kg: 20 }
-  ],
-  'Bench Press': [
-    { date: '2026-07-01', weight_kg: 30 },
-    { date: '2026-07-10', weight_kg: 35 },
-    { date: '2026-07-20', weight_kg: 45 }
-  ]
+const STRENGTH_EXERCISES = [
+  'Bench Press',
+  'Squat',
+  'Deadlift',
+  'Overhead Press',
+  'Dumbbell Shoulder Press',
+  'Bicep Curl',
+  'Lat Pulldown',
+  'Leg Press'
+]
+
+// Looks up an exercise's id by name/category. Unlike LogStrengthForm's version, this
+// never creates the exercise - if it doesn't exist yet, there's no progression data for
+// it either, so callers should just treat a null return as "no data".
+async function resolveExerciseId(name, category) {
+  const searchResponse = await authFetch(
+    `${EXERCISES_URL}?search=${encodeURIComponent(name)}&category=${category}`
+  )
+
+  if (!searchResponse.ok) {
+    return null
+  }
+
+  const results = await searchResponse.json()
+  const match = results.find(
+    (exercise) => exercise.name.toLowerCase() === name.toLowerCase()
+  )
+  return match ? match.id : null
 }
-
-const STRENGTH_EXERCISES = Object.keys(mockWeightProgressionByExercise)
 
 // ISO dates only ever carry month/day/year here, so no year needed in the display (e.g. "2026-07-22" -> "Jul 22").
 // timeZone: 'UTC' keeps date-only strings from shifting a day when the browser's local zone is negative UTC.
@@ -39,6 +54,12 @@ function formatDate(isoDate) {
     day: 'numeric',
     timeZone: 'UTC'
   })
+}
+
+// Frequency bars are bucketed by week (see WorkoutFrequencyView's TruncWeek), so the
+// x-axis needs "Week of" to make clear each bar isn't a single day's workout.
+function formatWeekLabel(isoDate) {
+  return `Week of ${formatDate(isoDate)}`
 }
 
 const tooltipStyle = {
@@ -54,15 +75,39 @@ const tooltipStyle = {
 
 function ProgressPage() {
   const [selectedExercise, setSelectedExercise] = useState(STRENGTH_EXERCISES[0])
+  const [weightProgressionRaw, setWeightProgressionRaw] = useState([])
   // Backend data is always kg; convert to lbs here for display only.
-  const weightProgression = mockWeightProgressionByExercise[selectedExercise].map(
-    (point) => ({ ...point, weight_lbs: kgToLbs(point.weight_kg) })
-  )
+  const weightProgression = weightProgressionRaw.map((point) => ({
+    ...point,
+    weight_lbs: kgToLbs(point.weight_kg)
+  }))
 
   const [frequency, setFrequency] = useState([])
   const [records, setRecords] = useState([])
   const [comparison, setComparison] = useState([])
   const [error, setError] = useState('')
+
+  const fetchWeightProgression = async (exerciseName) => {
+    try {
+      const exerciseId = await resolveExerciseId(exerciseName, 'strength')
+      if (!exerciseId) {
+        setWeightProgressionRaw([])
+        return
+      }
+
+      const response = await authFetch(`${PROGRESS_URL}weight-progression/${exerciseId}/`)
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
+        setError(data.detail || JSON.stringify(data) || 'Could not load weight progression')
+        return
+      }
+
+      setWeightProgressionRaw(await response.json())
+    } catch {
+      setError('Could not reach the server, please try again')
+    }
+  }
 
   const fetchFrequency = async () => {
     try {
@@ -121,6 +166,13 @@ function ProgressPage() {
     }
   }, [])
 
+  // re-fetch whenever the selected exercise changes
+  useEffect(() => {
+    if (isAuthenticated()) {
+      fetchWeightProgression(selectedExercise)
+    }
+  }, [selectedExercise])
+
   return (
     <div className="progress">
       {error && <p className="form-error">{error}</p>}
@@ -168,7 +220,7 @@ function ProgressPage() {
             <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
             <XAxis
               dataKey="week_start"
-              tickFormatter={formatDate}
+              tickFormatter={formatWeekLabel}
               tick={{ fill: 'var(--text)', fontSize: 13 }}
             />
             <YAxis allowDecimals={false} tick={{ fill: 'var(--text)', fontSize: 13 }} />

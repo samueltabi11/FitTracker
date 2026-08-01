@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { isAuthenticated, authFetch } from '../auth'
+import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 
-const WORKOUTS_URL = 'http://localhost:8000/api/workouts/'
+const WORKOUTS_URL = `${API_BASE_URL}/api/workouts/`
 
 function formatDate(isoDate) {
   return new Date(isoDate).toLocaleDateString('en-US', {
@@ -47,6 +47,9 @@ function HistoryPage() {
   const handleDelete = async (id) => {
     if (!isAuthenticated()) {
       setError('Sign in to manage workouts')
+      return
+    }
+    if (!window.confirm('Delete this workout?')) {
       return
     }
     setError('')

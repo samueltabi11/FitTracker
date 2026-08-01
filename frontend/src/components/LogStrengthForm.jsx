@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { isAuthenticated, authFetch } from '../auth'
+import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { lbsToKg } from '../utils/units'
 
-const WORKOUTS_URL = 'http://localhost:8000/api/workouts/'
-const EXERCISES_URL = 'http://localhost:8000/api/exercises/'
+const WORKOUTS_URL = `${API_BASE_URL}/api/workouts/`
+const EXERCISES_URL = `${API_BASE_URL}/api/exercises/`
 
 const STRENGTH_EXERCISES = [
   'Bench Press',

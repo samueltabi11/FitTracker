@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { isAuthenticated, authFetch } from '../auth'
+import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 
-const ACTIVITY_URL = 'http://localhost:8000/api/activity/'
+const ACTIVITY_URL = `${API_BASE_URL}/api/activity/`
 
 function todayDate() {
   return new Date().toISOString().split('T')[0]
