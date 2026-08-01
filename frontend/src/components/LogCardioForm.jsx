@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { milesToKm } from '../utils/units'
 import { extractErrorMessage } from '../utils/errors'
+import { todayDate } from '../utils/dates'
 
 const WORKOUTS_URL = `${API_BASE_URL}/api/workouts/`
 const EXERCISES_URL = `${API_BASE_URL}/api/exercises/`
@@ -53,7 +54,7 @@ async function resolveExerciseId(name, category) {
 // cardio's own form since it's a separate table on the backend (no sets/reps/weight here, that's strength only)
 function LogCardioForm() {
   const [workoutName, setWorkoutName] = useState('')
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState(todayDate())
   const [duration, setDuration] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -65,7 +66,6 @@ function LogCardioForm() {
   // distance is entered by the user in miles (display unit); converted to km only
   // when building the payload sent to the backend.
   const [distance, setDistance] = useState('')
-  const [difficulty, setDifficulty] = useState('')
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -83,9 +83,6 @@ function LogCardioForm() {
     try {
       const exerciseId = await resolveExerciseId(exerciseName, 'cardio')
 
-      // NOTE: difficulty has no backing field on the backend (WorkoutSet only has
-      // set_number/reps/weight_kg/duration_seconds/distance_km/is_completed), so it
-      // isn't sent here - it would just be silently dropped by the serializer.
       const workoutData = {
         name: workoutName,
         workout_type: 'cardio',
@@ -99,7 +96,7 @@ function LogCardioForm() {
             sets: [
               {
                 set_number: 1,
-                distance_km: milesToKm(parseFloat(distance)),
+                distance_km: distance ? milesToKm(parseFloat(distance)) : null,
                 is_completed: false
               }
             ]
@@ -121,13 +118,12 @@ function LogCardioForm() {
 
       setSuccess('Workout saved!')
       setWorkoutName('')
-      setDate('')
+      setDate(todayDate())
       setDuration('')
       setNotes('')
       setExerciseSelection(CARDIO_EXERCISES[0])
       setCustomExerciseName('')
       setDistance('')
-      setDifficulty('')
     } catch {
       setError('Could not reach the server, please try again')
     }
@@ -156,6 +152,7 @@ function LogCardioForm() {
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          max={todayDate()}
           required
         />
       </div>
@@ -196,25 +193,12 @@ function LogCardioForm() {
       </div>
 
       <div>
-        <label>Distance (mi)</label>
+        <label>Distance (mi, optional)</label>
         <input
           type="number"
           step="0.01"
           value={distance}
           onChange={(e) => setDistance(e.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label>Difficulty (1-10)</label>
-        <input
-          type="number"
-          min="1"
-          max="10"
-          value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
-          required
         />
       </div>
 
