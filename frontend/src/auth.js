@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:8000'
+export const API_BASE_URL = 'https://fittracker-4cqg.onrender.com'
 
 export const TOKEN_KEY = 'fittracker_token'
 export const REFRESH_TOKEN_KEY = 'fittracker_refresh_token'
