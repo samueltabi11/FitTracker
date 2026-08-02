@@ -63,6 +63,17 @@ function formatWeekLabel(isoDate) {
   return `Week of ${formatDate(isoDate)}`
 }
 
+// Pads the line's actual min/max by 10% so its variation is visible instead of
+// compressed against a 0-based scale. Falls back to a flat +/-10% (or +/-10 when the
+// value is 0) if every point is identical, since a zero-width range can't be padded by
+// a percentage of itself.
+function weightAxisDomain([dataMin, dataMax]) {
+  const padding = dataMin === dataMax
+    ? (dataMin === 0 ? 10 : Math.abs(dataMin) * 0.1)
+    : (dataMax - dataMin) * 0.1
+  return [dataMin - padding, dataMax + padding]
+}
+
 const tooltipStyle = {
   contentStyle: {
     background: 'var(--code-bg)',
@@ -199,7 +210,7 @@ function ProgressPage() {
               tickFormatter={formatDate}
               tick={{ fill: 'var(--text)', fontSize: 13 }}
             />
-            <YAxis tick={{ fill: 'var(--text)', fontSize: 13 }} />
+            <YAxis domain={weightAxisDomain} tick={{ fill: 'var(--text)', fontSize: 13 }} />
             <Tooltip {...tooltipStyle} />
             <Line
               type="monotone"

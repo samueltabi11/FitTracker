@@ -1,13 +1,10 @@
 import { useState, useEffect } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { extractErrorMessage } from '../utils/errors'
+import { todayDate } from '../utils/dates'
 import ConfirmModal from './ConfirmModal'
 
 const ACTIVITY_URL = `${API_BASE_URL}/api/activity/`
-
-function todayDate() {
-  return new Date().toISOString().split('T')[0]
-}
 
 function formatDate(isoDate) {
   return new Date(isoDate).toLocaleDateString('en-US', {
@@ -176,6 +173,7 @@ function LogActivityPage() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            max={todayDate()}
             required
           />
         </div>

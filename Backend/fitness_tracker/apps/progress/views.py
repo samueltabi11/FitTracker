@@ -92,10 +92,8 @@ class WeightProgressionView(APIView):
                 workout_exercise__exercise_id=exercise_id,
                 weight_kg__isnull=False,
             )
-            .values(
-                "workout_exercise__workout__date",
-                "weight_kg",
-            )
+            .values("workout_exercise__workout__date")
+            .annotate(weight_kg=Max("weight_kg"))
             .order_by("workout_exercise__workout__date")
         )
 

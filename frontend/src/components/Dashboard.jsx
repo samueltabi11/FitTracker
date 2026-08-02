@@ -11,6 +11,9 @@ function Dashboard() {
       <Link to="/log-cardio">
         <button type="button">Log Cardio</button>
       </Link>
+      <Link to="/log-activity">
+        <button type="button">Log Activity</button>
+      </Link>
       <Link to="/goals">
         <button type="button">Goals</button>
       </Link>

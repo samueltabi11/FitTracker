@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 from .models import ActivityLog
 
@@ -7,6 +8,11 @@ class ActivityLogSerializer(serializers.ModelSerializer):
         model = ActivityLog
         fields = '__all__'
         read_only_fields = ('user', 'created_at')
+
+    def validate_date(self, value):
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Date cannot be in the future.")
+        return value
 
     # user is read-only with no default, so DRF can't build a working
     # UniqueTogetherValidator for the model's (user, date, source) constraint -

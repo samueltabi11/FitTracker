@@ -76,7 +76,7 @@ function HistoryPage() {
     setExpandedId(id)
     setDetailError('')
 
-    // already fetched this one on a previous expand - reuse it
+    // Reuse the previously fetched detail if this workout was already expanded once.
     if (workoutDetails[id]) {
       return
     }

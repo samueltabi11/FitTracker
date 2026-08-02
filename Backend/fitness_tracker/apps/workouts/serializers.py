@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 from .models import Exercise, Workout, WorkoutExercise, WorkoutSet
 
@@ -32,7 +33,12 @@ class WorkoutSerializer(serializers.ModelSerializer):
         model = Workout
         fields = '__all__'
         read_only_fields = ('user',)
-    
+
+    def validate_date(self, value):
+        if value > timezone.now().date():
+            raise serializers.ValidationError("Date cannot be in the future.")
+        return value
+
     def create(self, validated_data):
         exercises_data = validated_data.pop('exercises')
         workout = Workout.objects.create(**validated_data)

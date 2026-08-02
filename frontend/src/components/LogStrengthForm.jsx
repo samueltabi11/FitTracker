@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { API_BASE_URL, isAuthenticated, authFetch } from '../auth'
 import { lbsToKg } from '../utils/units'
 import { extractErrorMessage } from '../utils/errors'
+import { todayDate } from '../utils/dates'
 
 const WORKOUTS_URL = `${API_BASE_URL}/api/workouts/`
 const EXERCISES_URL = `${API_BASE_URL}/api/exercises/`
@@ -51,10 +52,11 @@ async function resolveExerciseId(name, category) {
   return created.id
 }
 
-// strength's own form since it's a separate table on the backend (sets/reps/weight live here, cardio doesn't have these)
+// Strength workouts get their own form because they're stored as a separate table on
+// the backend: sets, reps, and weight live here, whereas cardio workouts don't have them.
 function LogStrengthForm() {
   const [workoutName, setWorkoutName] = useState('')
-  const [date, setDate] = useState('')
+  const [date, setDate] = useState(todayDate())
   const [duration, setDuration] = useState('')
   const [notes, setNotes] = useState('')
 
@@ -72,7 +74,7 @@ function LogStrengthForm() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // just tacks on another blank set, numbering is based on however many are already there
+  // Appends a new blank set, numbering it based on how many sets already exist.
   const addSet = () => {
     setSets([
       ...sets,
@@ -86,7 +88,7 @@ function LogStrengthForm() {
     setSets(updatedSets)
   }
 
-  // drops the set and renumbers the rest so set_number stays sequential
+  // Removes the set and renumbers the remaining sets so set_number stays sequential.
   const removeSet = (index) => {
     const updatedSets = sets
       .filter((_, i) => i !== index)
@@ -141,7 +143,7 @@ function LogStrengthForm() {
 
       setSuccess('Workout saved!')
       setWorkoutName('')
-      setDate('')
+      setDate(todayDate())
       setDuration('')
       setNotes('')
       setExerciseSelection(STRENGTH_EXERCISES[0])
@@ -175,6 +177,7 @@ function LogStrengthForm() {
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
+          max={todayDate()}
           required
         />
       </div>

@@ -51,7 +51,8 @@ async function resolveExerciseId(name, category) {
   return created.id
 }
 
-// cardio's own form since it's a separate table on the backend (no sets/reps/weight here, that's strength only)
+// Cardio workouts get their own form because they're stored as a separate table on
+// the backend, and don't carry sets, reps, or weight the way strength workouts do.
 function LogCardioForm() {
   const [workoutName, setWorkoutName] = useState('')
   const [date, setDate] = useState(todayDate())

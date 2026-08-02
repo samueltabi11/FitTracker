@@ -9,8 +9,8 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  // already signed in (real or guest) — visiting /login directly shouldn't be
-  // possible to re-enter through, since that's how guest/real tokens end up mixed
+  // Redirect away if already signed in (real or guest). Reaching this form while a
+  // session is active is how guest and real tokens end up mixed with each other.
   if (hasAccess()) {
     return <Navigate to="/" replace />
   }
